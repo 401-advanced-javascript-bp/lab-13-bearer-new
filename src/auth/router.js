@@ -26,10 +26,15 @@ authRouter.post('/signin', auth, (req, res, next) => {
 
 authRouter.get('/oauth', (req,res,next) => {
   oauth.authorize(req)
-    .then( token => {
+    .then( (token) => {
       res.status(200).send(token);
     })
     .catch(next);
+});
+
+authRouter.get('/protected-route',auth,(request, response, next) => {
+  console.log('this is token', token);
+  response.status(200).send();
 });
 
 module.exports = authRouter;
