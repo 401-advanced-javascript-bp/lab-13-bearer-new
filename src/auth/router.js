@@ -13,7 +13,9 @@ authRouter.post('/signup', (req, res, next) => {
     .then( (user) => {
       req.token = user.generateToken();
       req.user = user;
+      //the set method sets a new property to the response object header
       res.set('token', req.token);
+      
       res.cookie('auth', req.token);
       res.send(req.token);
     }).catch(next);

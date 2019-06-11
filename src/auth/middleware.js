@@ -8,8 +8,11 @@ module.exports = (req, res, next) => {
     const authorizationHeader = req.headers.authorization; //new
     
     const splitHeader = authorizationHeader.split(/\s+/); //new
+    //authType is either Basic or Bearer
+    //authString is either password or token
     let [authType, authString] = splitHeader;
-    
+
+    //switch is a cleaner alternative to if, else, else
     switch( authType.toLowerCase() ) {
     case 'basic': 
       return _authBasic(authString);
@@ -23,6 +26,7 @@ module.exports = (req, res, next) => {
     return res.status(404).send();
     // next(e);
   }
+  
   
   function _authBasic(str) {
     // str: am9objpqb2hubnk=
