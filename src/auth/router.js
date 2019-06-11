@@ -13,7 +13,9 @@ authRouter.post('/signup', (req, res, next) => {
     .then( (user) => {
       req.token = user.generateToken();
       req.user = user;
+      //the set method sets a new property to the response object header
       res.set('token', req.token);
+      
       res.cookie('auth', req.token);
       res.send(req.token);
     }).catch(next);
@@ -26,10 +28,15 @@ authRouter.post('/signin', auth, (req, res, next) => {
 
 authRouter.get('/oauth', (req,res,next) => {
   oauth.authorize(req)
-    .then( token => {
+    .then( (token) => {
       res.status(200).send(token);
     })
     .catch(next);
+});
+
+authRouter.get('/protected-route',auth,(request, response, next) => {
+  console.log('this is token', token);
+  response.status(200).send();
 });
 
 module.exports = authRouter;

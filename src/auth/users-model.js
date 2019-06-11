@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const jsonWebToken = require('jsonwebtoken');
 
 const users = new mongoose.Schema({
   username: {type:String, required:true, unique:true},
@@ -58,7 +58,22 @@ users.methods.generateToken = function() {
     role: this.role,
   };
   
-  return jwt.sign(token, process.env.SECRET);
+  return jsonWebToken.sign(token, process.env.SECRET);
 };
 
+users.statics.authenticateToken = function (token) {
+  const decryptedToken = jsonWebToken.verify(token, process.env.SECRET);
+
+  const query = {_id: decryptedToken.id};
+  return this.findOne(query);
+};
+
+
+// function _authenticateToken(token) {
+//   try {
+//     return User.authenticateToken(token)
+//       .then(_authenticate)
+//       .catch(next);
+//   }
+// }
 module.exports = mongoose.model('users', users);

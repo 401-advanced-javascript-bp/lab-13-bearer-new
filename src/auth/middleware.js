@@ -5,17 +5,26 @@ const User = require('./users-model.js');
 module.exports = (req, res, next) => {
   
   try {
-    let [authType, authString] = req.headers.authorization.split(/\s+/);
+    const authorizationHeader = req.headers.authorization; //new
     
+    const splitHeader = authorizationHeader.split(/\s+/); //new
+    //authType is either Basic or Bearer
+    //authString is either password or token
+    let [authType, authString] = splitHeader;
+
+    //switch is a cleaner alternative to if, else, else
     switch( authType.toLowerCase() ) {
-      case 'basic': 
-        return _authBasic(authString);
-      default: 
-        return _authError();
+    case 'basic': 
+      return _authBasic(authString);
+    case 'bearer':
+      return _authBearer(authString);
+    default: 
+      return res.status(404).send();
     }
   }
   catch(e) {
-    next(e);
+    return res.status(404).send();
+    // next(e);
   }
   
   
@@ -29,6 +38,17 @@ module.exports = (req, res, next) => {
     return User.authenticateBasic(auth)
       .then(user => _authenticate(user) )
       .catch(next);
+  }
+
+  function _authBearer(token){
+    try{
+      return User.authenticateToken(token)
+        .then(_authenticate)
+        .catch(next);
+    }
+    catch(error){
+      res.status(404).send();
+    }
   }
 
   function _authenticate(user) {
